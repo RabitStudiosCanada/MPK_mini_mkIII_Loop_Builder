@@ -21,12 +21,13 @@ export function ControllerMapperView({ engine }: { engine: AudioEngine }) {
   const [padNotes, setPadNotes] = useState<Record<string, number>>(defaultPadNotes);
   const [keyRangeStart, setKeyRangeStart] = useState(defaultKeyRangeStart);
 
-  useEffect(() => {
-    midi.connect((msg) => {
+  const requestConnect = async () => {
+    const next = await midi.connect((msg) => {
       setStatus({ ...midi.state });
       setLog((prev) => [msg, ...prev].slice(0, 50));
     });
-  }, [midi]);
+    setStatus({ ...next });
+  };
 
   useEffect(() => {
     listProfiles().then(setProfiles);
@@ -64,7 +65,8 @@ export function ControllerMapperView({ engine }: { engine: AudioEngine }) {
           <div>
             <p>Status: <span className="badge">{status.status}</span></p>
             <p>Device: {status.deviceName ?? 'Not connected'}</p>
-            <button onClick={() => midi.connect(() => {})}>Retry Connect</button>
+            {status.message && <p className="muted">{status.message}</p>}
+            <button onClick={requestConnect}>Request MIDI Access</button>
           </div>
           <div className="flex-col">
             <label>

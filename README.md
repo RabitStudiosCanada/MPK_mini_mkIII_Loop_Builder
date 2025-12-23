@@ -19,6 +19,8 @@ npm run dev
 ```
 
 3. Open the printed local URL in a Chromium-based browser (Chrome/Edge) because the Web MIDI API is required.
+   - Use `http://localhost` (loopback) or `https://` — Web MIDI will be blocked on non-secure LAN IPs like `http://192.168.x.x`.
+   - After the page loads, click **Request MIDI Access** in the Controller Mapper to trigger the permission prompt.
 
 ### Build for production
 
@@ -36,6 +38,7 @@ npm run build
 ### Notes
 
 - Audio won’t start until you click **Enable Audio** due to browser autoplay policies.
-- If no MIDI device is connected or permission is denied, the mapper view will show the connection status so you can retry.
+- If no MIDI device is connected or permission is denied, the mapper view will show the connection status/message so you can retry.
+- Web MIDI requires either `https://` or `http://localhost`. If you see a secure-context error, switch the URL to loopback or serve via HTTPS.
 - Loops are MIDI-based; changing BPM keeps them in time. Sample time-stretching is intentionally out of scope for the MVP.
 - The MPK mini keybed (25 keys) and 8 pads are both mapped for recording. Use the controller mapper to set the first key's MIDI note if your keyboard octave shifts.
