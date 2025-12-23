@@ -46,14 +46,14 @@ export function ArrangementView({
   };
 
   return (
-    <div className="grid">
-      <section className="panel flex-row" style={{ justifyContent: 'space-between' }}>
-        <div className="flex-row" style={{ gap: '0.5rem' }}>
-          <button onClick={startPlayback}>Play Arrangement</button>
+    <div className="arrangement-panel">
+      <div className="arrange-toolbar">
+        <div className="flex-row" style={{ gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button onClick={startPlayback}>Play</button>
           <button onClick={stopPlayback}>Stop</button>
           <button onClick={onAddTrack}>Add Track</button>
         </div>
-        <div className="flex-row" style={{ gap: '0.5rem' }}>
+        <div className="flex-row" style={{ gap: '0.5rem', flexWrap: 'wrap' }}>
           <select value={selectedClip} onChange={(e) => setSelectedClip(e.target.value)}>
             <option value="">Select clip</option>
             {project.clips.map((clip) => (
@@ -68,47 +68,61 @@ export function ArrangementView({
           </label>
           <button onClick={place}>Place Clip</button>
         </div>
-      </section>
+      </div>
 
-      <section className="panel">
-        <h3>Timeline</h3>
-        <div className="grid" style={{ gap: '0.75rem' }}>
-          {project.tracks.map((track) => (
-            <div key={track.id} className="track-lane">
-              <div className="flex-col">
-                <strong>{track.name}</strong>
-                <label>
-                  Volume
-                  <input
-                    type="range"
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    value={track.volume}
-                    onChange={(e) => onVolumeChange(track.id, parseFloat(e.target.value))}
-                  />
-                </label>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${trackGrid.length}, minmax(20px, 1fr))`, gap: '4px' }}>
-                {trackGrid.map((bar) => (
-                  <div key={bar} style={{ border: '1px solid #1f2633', minHeight: '36px', position: 'relative' }}>
-                    {project.placements
-                      .filter((p) => p.trackId === track.id && p.startBar === bar)
-                      .map((placement) => {
-                        const clip = project.clips.find((c) => c.id === placement.clipId);
-                        return (
-                          <div key={placement.id} className="clip-block" style={{ position: 'absolute', inset: '2px' }}>
-                            {clip?.name ?? 'Clip'}
-                          </div>
-                        );
-                      })}
-                  </div>
-                ))}
-              </div>
-            </div>
+      <div className="bar-labels">
+        <div className="bar-label-track">Track</div>
+        <div className="bar-label-grid">
+          {trackGrid.map((bar) => (
+            <span key={`bar-${bar}`}>{bar}</span>
           ))}
         </div>
-      </section>
+      </div>
+
+      <div className="timeline-grid">
+        {project.tracks.map((track) => (
+          <div key={track.id} className="track-lane">
+            <div className="track-label">
+              <strong>{track.name}</strong>
+              <label>
+                Volume
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={track.volume}
+                  onChange={(e) => onVolumeChange(track.id, parseFloat(e.target.value))}
+                />
+              </label>
+            </div>
+            <div className="track-grid" style={{ gridTemplateColumns: `repeat(${trackGrid.length}, minmax(20px, 1fr))` }}>
+              {trackGrid.map((bar) => (
+                <div key={`${track.id}-bar-${bar}`} className="bar-cell" />
+              ))}
+              {project.placements
+                .filter((p) => p.trackId === track.id)
+                .map((placement) => {
+                  const clip = project.clips.find((c) => c.id === placement.clipId);
+                  return (
+                    <div
+                      key={placement.id}
+                      className="clip-block"
+                      style={{ gridColumn: `${placement.startBar} / span ${placement.lengthBars || 1}`, margin: '4px' }}
+                    >
+                      <div className="wave-lines">
+                        {Array.from({ length: 14 }).map((_, idx) => (
+                          <span key={idx} style={{ height: `${6 + ((idx * 23) % 20)}px` }} />
+                        ))}
+                      </div>
+                      {clip?.name ?? 'Clip'}
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

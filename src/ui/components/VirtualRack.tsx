@@ -8,7 +8,7 @@ export function VirtualRack({ slots }: { slots: InstrumentSlot[] }) {
         All built-in instruments are ready: drum rack on pads, mini keys synth on the piano keys, and knobs for
         mixer/macros. Expand later by adding more slots.
       </p>
-      <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+      <div className="rack-grid">
         {slots.map((slot) => (
           <div key={slot.id} className="rack-slot">
             <div className="flex-row" style={{ justifyContent: 'space-between' }}>

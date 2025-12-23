@@ -206,8 +206,9 @@ export function LoopBuilderView({
         <div className="grid">
           {clips.length === 0 && <p>No clips yet.</p>}
           {clips.map((clip) => (
-            <div key={clip.id} className="clip-block">
-              {clip.name} · {clip.events.length} notes · {clip.lengthBars} bars
+            <div key={clip.id} className="loop-card">
+              <strong>{clip.name}</strong>
+              <div className="muted">{clip.events.length} notes · {clip.lengthBars} bars</div>
             </div>
           ))}
         </div>
