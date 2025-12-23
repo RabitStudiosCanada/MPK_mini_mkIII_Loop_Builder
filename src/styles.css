@@ -1,0 +1,177 @@
+:root {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0f1115;
+  color: #e8ecf0;
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: #9ad5ff;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background: #151922;
+  border-bottom: 1px solid #1f2633;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+button,
+input,
+select,
+textarea {
+  background: #1d2432;
+  border: 1px solid #2b3447;
+  color: #e8ecf0;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+}
+
+button:hover {
+  border-color: #3a7bf6;
+}
+
+.main-content {
+  flex: 1;
+  padding: 1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.panel {
+  background: #131722;
+  border: 1px solid #1f2633;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.flex-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.track-lane {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.grid {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  border: 1px solid #1f2633;
+  padding: 0.35rem;
+}
+
+.clip-block {
+  background: linear-gradient(135deg, #3a7bf6, #9356ff);
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  color: #0b0d11;
+  font-weight: 600;
+  text-align: center;
+}
+
+.pad-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.keys-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  max-width: 620px;
+}
+
+.key-pill {
+  background: #1f2633;
+  color: #e2e8f0;
+  border: 1px solid #374151;
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.key-pill:hover {
+  background: #2d3647;
+}
+
+.pad-card {
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #1f2633;
+  background: #181d2b;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.35rem;
+  border-radius: 999px;
+  background: #1f2633;
+  color: #9ad5ff;
+  font-size: 0.75rem;
+}
+
+.midi-log {
+  max-height: 200px;
+  overflow: auto;
+  border: 1px solid #1f2633;
+  padding: 0.5rem;
+  border-radius: 6px;
+  background: #0e121b;
+}
+
+.rack-slot {
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+
+h2,
+h3,
+h4 {
+  margin: 0 0 0.35rem;
+}
+
+label {
+  font-size: 0.9rem;
+}
