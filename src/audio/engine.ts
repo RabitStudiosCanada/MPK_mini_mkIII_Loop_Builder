@@ -13,6 +13,7 @@ export class AudioEngine {
   private masterGain: GainNode;
   private tracks: Map<string, TrackState> = new Map();
   private sampler: SamplerInstrument;
+  private keyInstrument: SamplerInstrument;
 
   constructor(bpm = 100) {
     this.context = new AudioContext();
@@ -21,6 +22,7 @@ export class AudioEngine {
     this.masterGain.connect(this.context.destination);
     this.transport = new Transport(this.context, bpm);
     this.sampler = new SamplerInstrument(this.context);
+    this.keyInstrument = new SamplerInstrument(this.context);
   }
 
   ensureTrack(id: string) {
@@ -53,6 +55,11 @@ export class AudioEngine {
     } else {
       this.sampler.playNote(pad.note, pad.gain);
     }
+  }
+
+  triggerKey(note: number, velocity = 1, when?: number, trackId = 'keys') {
+    const track = this.ensureTrack(trackId);
+    this.keyInstrument.playNote(note, velocity, when, track.gain);
   }
 
   playClipOnTrack(clip: MidiClip, trackId: string, startAtBar: number) {

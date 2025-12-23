@@ -114,6 +114,26 @@ button:hover {
   gap: 0.75rem;
 }
 
+.keys-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  max-width: 620px;
+}
+
+.key-pill {
+  background: #1f2633;
+  color: #e2e8f0;
+  border: 1px solid #374151;
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.key-pill:hover {
+  background: #2d3647;
+}
+
 .pad-card {
   padding: 0.75rem;
   border-radius: 8px;
@@ -137,6 +157,13 @@ button:hover {
   padding: 0.5rem;
   border-radius: 6px;
   background: #0e121b;
+}
+
+.rack-slot {
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+  padding: 0.75rem;
 }
 
 h2,

@@ -30,7 +30,7 @@ npm run build
 
 - `src/audio` — transport clock, audio engine, and instruments.
 - `src/midi` — Web MIDI connection helper and event parsing.
-- `src/ui` — React views for the controller mapper, loop builder, and arrangement plus shared components.
+- `src/ui` — React views for the controller mapper, loop builder, and arrangement plus shared components (transport, virtual rack).
 - `src/storage` — IndexedDB helper wrappers (idb-keyval).
 
 ### Notes
@@ -38,3 +38,4 @@ npm run build
 - Audio won’t start until you click **Enable Audio** due to browser autoplay policies.
 - If no MIDI device is connected or permission is denied, the mapper view will show the connection status so you can retry.
 - Loops are MIDI-based; changing BPM keeps them in time. Sample time-stretching is intentionally out of scope for the MVP.
+- The MPK mini keybed (25 keys) and 8 pads are both mapped for recording. Use the controller mapper to set the first key's MIDI note if your keyboard octave shifts.

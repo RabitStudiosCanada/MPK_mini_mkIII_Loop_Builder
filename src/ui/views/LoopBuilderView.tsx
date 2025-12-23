@@ -1,12 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AudioEngine } from '../../audio/engine';
-import { MidiClip, MidiEvent, PadConfig } from '../../types';
+import { MidiManager } from '../../midi/midi';
+import { InstrumentSlot, MidiClip, MidiEvent, PadConfig } from '../../types';
+import { VirtualRack } from '../components/VirtualRack';
 
 const defaultPads: PadConfig[] = Array.from({ length: 8 }).map((_, idx) => ({
   id: `pad-${idx + 1}`,
   note: 36 + idx,
   gain: 0.8,
 }));
+
+const defaultRack: InstrumentSlot[] = [
+  {
+    id: 'rack-drums',
+    name: 'Drum Rack (Pads 1-8)',
+    type: 'drum-rack',
+    description: 'Route MPK pads to samples or fallback synth hits.',
+  },
+  {
+    id: 'rack-keys',
+    name: 'Mini Keys Synth',
+    type: 'keys',
+    description: '25-key piano range into a simple saw/sine hybrid sampler.',
+  },
+  {
+    id: 'rack-macros',
+    name: 'K1-K8 Macro Bank',
+    type: 'macro',
+    description: 'Ready for mixer levels or filter/macros pages.',
+  },
+];
 
 type PadState = PadConfig & { buffer?: AudioBuffer };
 
@@ -24,10 +47,17 @@ export function LoopBuilderView({
   onAddClip: (clip: MidiClip) => void;
 }) {
   const [pads, setPads] = useState<PadState[]>(defaultPads);
+  const [keyRangeStart, setKeyRangeStart] = useState(48);
   const [clipLength, setClipLength] = useState(1);
   const [quantize, setQuantize] = useState(true);
   const [recorder, setRecorder] = useState<RecorderState>({ isRecording: false, events: [], startTime: 0 });
   const [clips, setClips] = useState<MidiClip[]>([]);
+  const midi = useMemo(() => new MidiManager(), []);
+  const padsRef = useRef(pads);
+
+  useEffect(() => {
+    padsRef.current = pads;
+  }, [pads]);
 
   const handlePadTrigger = (pad: PadState) => {
     engine.triggerPad(pad, pad.buffer);
@@ -37,6 +67,18 @@ export function LoopBuilderView({
       const quantizeStep = quantize ? engine.transport.secondsPerBeat() / 4 : 0;
       const quantizedTime = quantize ? Math.round(time / quantizeStep) * quantizeStep : time;
       const evt: MidiEvent = { note: pad.note, velocity: 100, time: quantizedTime };
+      setRecorder((r) => ({ ...r, events: [...r.events, evt] }));
+    }
+  };
+
+  const handleKeyTrigger = (note: number, velocity = 1) => {
+    engine.triggerKey(note, velocity);
+    if (recorder.isRecording) {
+      const now = engine.context.currentTime;
+      const time = now - recorder.startTime;
+      const quantizeStep = quantize ? engine.transport.secondsPerBeat() / 4 : 0;
+      const quantizedTime = quantize ? Math.round(time / quantizeStep) * quantizeStep : time;
+      const evt: MidiEvent = { note, velocity: Math.round(velocity * 127), time: quantizedTime };
       setRecorder((r) => ({ ...r, events: [...r.events, evt] }));
     }
   };
@@ -67,7 +109,17 @@ export function LoopBuilderView({
 
   useEffect(() => {
     engine.context.resume();
-  }, [engine]);
+    midi.connect((msg) => {
+      if (msg.type === 'noteon' && msg.note !== undefined) {
+        const pad = padsRef.current.find((p) => p.note === msg.note);
+        if (pad) {
+          handlePadTrigger(pad);
+        } else {
+          handleKeyTrigger(msg.note, (msg.velocity ?? 100) / 127);
+        }
+      }
+    });
+  }, [engine, midi]);
 
   return (
     <div className="grid">
@@ -119,6 +171,35 @@ export function LoopBuilderView({
         </div>
         <p>Record pad hits into a MIDI loop synced to the transport BPM.</p>
       </section>
+
+      <section className="panel">
+        <h3>Mini Keys (25-key)</h3>
+        <p>Trigger the MPK mini keybed or click notes to add melodic MIDI into your loop.</p>
+        <div className="flex-row" style={{ gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <label>
+            First key MIDI note
+            <input
+              type="number"
+              min={0}
+              max={108}
+              value={keyRangeStart}
+              onChange={(e) => setKeyRangeStart(parseInt(e.target.value, 10))}
+            />
+          </label>
+          <div className="keys-preview">
+            {Array.from({ length: 25 }).map((_, idx) => {
+              const note = keyRangeStart + idx;
+              return (
+                <button key={note} className="key-pill" onClick={() => handleKeyTrigger(note)} title={`MIDI ${note}`}>
+                  {note}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <VirtualRack slots={defaultRack} />
 
       <section className="panel">
         <h3>Saved Clips</h3>

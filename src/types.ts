@@ -58,4 +58,12 @@ export type ControllerProfile = {
   padNotes: Record<string, number>;
   knobCCs: Record<string, number>;
   knobPage: 'mixer' | 'macros';
+  keyRangeStart?: number;
+};
+
+export type InstrumentSlot = {
+  id: string;
+  name: string;
+  type: 'drum-rack' | 'keys' | 'macro';
+  description: string;
 };

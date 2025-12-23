@@ -9,6 +9,8 @@ const defaultPadNotes = Array.from({ length: 8 }).reduce<Record<string, number>>
   return acc;
 }, {});
 
+const defaultKeyRangeStart = 48; // C3
+
 export function ControllerMapperView({ engine }: { engine: AudioEngine }) {
   const midi = useMemo(() => new MidiManager(), []);
   const [status, setStatus] = useState(midi.state);
@@ -17,6 +19,7 @@ export function ControllerMapperView({ engine }: { engine: AudioEngine }) {
   const [knobPage, setKnobPage] = useState<'mixer' | 'macros'>('mixer');
   const [profiles, setProfiles] = useState<string[]>([]);
   const [padNotes, setPadNotes] = useState<Record<string, number>>(defaultPadNotes);
+  const [keyRangeStart, setKeyRangeStart] = useState(defaultKeyRangeStart);
 
   useEffect(() => {
     midi.connect((msg) => {
@@ -37,6 +40,7 @@ export function ControllerMapperView({ engine }: { engine: AudioEngine }) {
       padNotes,
       knobCCs: {},
       knobPage,
+      keyRangeStart,
     };
     await saveProfile(profile);
     setProfiles(await listProfiles());
@@ -48,6 +52,7 @@ export function ControllerMapperView({ engine }: { engine: AudioEngine }) {
       setProfileName(loaded.name);
       setPadNotes(loaded.padNotes);
       setKnobPage(loaded.knobPage);
+      setKeyRangeStart(loaded.keyRangeStart ?? defaultKeyRangeStart);
     }
   };
 
@@ -105,6 +110,39 @@ export function ControllerMapperView({ engine }: { engine: AudioEngine }) {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="panel">
+        <h3>Piano Keys Mapping</h3>
+        <p>The MPK mini has 25 keys. Set the starting note and preview the mapped range.</p>
+        <div className="flex-row" style={{ gap: '0.75rem', flexWrap: 'wrap' }}>
+          <label>
+            First key MIDI note
+            <input
+              type="number"
+              min={0}
+              max={108}
+              value={keyRangeStart}
+              onChange={(e) => setKeyRangeStart(parseInt(e.target.value, 10))}
+            />
+          </label>
+          <div className="keys-preview">
+            {Array.from({ length: 25 }).map((_, idx) => {
+              const note = keyRangeStart + idx;
+              return (
+                <button
+                  key={note}
+                  className="key-pill"
+                  onClick={() => engine.triggerKey(note, 0.9)}
+                  title={`MIDI ${note}`}
+                >
+                  {note}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <p className="muted">Keys send to the default instrument rack so you can record loops from the piano keyboard.</p>
       </section>
 
       <section className="panel">
