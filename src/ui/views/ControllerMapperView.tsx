@@ -110,7 +110,7 @@ export function ControllerMapperView({ engine }: { engine: AudioEngine }) {
             <div className="mini-keys">
               {Array.from({ length: 25 }).map((_, idx) => {
                 const note = keyRangeStart + idx;
-                const pattern = [false, true, false, false, true, false, true, false, false, true, false, true];
+                const pattern = [false, true, false, true, false, false, true, false, true, false, true, false];
                 const isBlack = pattern[(keyRangeStart + idx) % 12];
                 return (
                   <div

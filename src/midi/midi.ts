@@ -1,7 +1,7 @@
 import { MidiMessage } from '../types';
 
 export type MidiConnection = {
-  status: 'connected' | 'disconnected' | 'unsupported' | 'error';
+  status: 'connected' | 'disconnected' | 'unsupported' | 'error' | 'permission-blocked';
   deviceName?: string;
   log: MidiMessage[];
   message?: string;
@@ -18,9 +18,10 @@ export class MidiManager {
     this.handler = onMessage;
     if (!window.isSecureContext) {
       this.state = {
-        status: 'unsupported',
+        status: 'permission-blocked',
         log: [],
-        message: 'Web MIDI requires HTTPS/localhost. Open the dev server over https://localhost or enable the experimental flag.'
+        message:
+          'Web MIDI requires HTTPS or http://localhost. Open the dev server on loopback/https and then retry the permission prompt.'
       };
       return this.state;
     }
@@ -49,11 +50,20 @@ export class MidiManager {
       });
     } catch (err) {
       console.error(err);
-      this.state = {
-        status: 'error',
-        log: [],
-        message: err instanceof DOMException ? err.message : 'Permission denied or device busy.'
-      };
+      if (err instanceof DOMException && (err.name === 'NotAllowedError' || err.name === 'SecurityError')) {
+        this.state = {
+          status: 'permission-blocked',
+          log: [],
+          message:
+            'Browser blocked MIDI. Click Request MIDI Access after a user gesture, ensure site permissions allow "MIDI devices", and avoid non-HTTPS origins.',
+        };
+      } else {
+        this.state = {
+          status: 'error',
+          log: [],
+          message: err instanceof DOMException ? err.message : 'Permission denied or device busy.'
+        };
+      }
     }
     return this.state;
   }
